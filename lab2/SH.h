@@ -94,7 +94,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "cp") {
 		if (params.size() == 5) {
-			if (fs.checkDirPermissions(whoami))
+			if (fs.checkDirPermissions(whoami, params[1]))
 				fs.copyFile(params[1], params[2]);
 			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
@@ -103,7 +103,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "mv") {
 		if (params.size() == 5) {
-			if (fs.checkDirPermissions(whoami))
+			if (fs.checkDirPermissions(whoami, params[1]))
 				fs.moveFile(params[1], params[2]);
 			else
 				cout << "sh: " + command + " :Permission denied." << endl;
@@ -113,7 +113,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "rm") {
 		if (params.size() == 4) {
-			if (fs.checkDirPermissions(whoami))
+			if (fs.checkDirPermissions(whoami, params[1]))
 				fs.deleteFile(params[1]);
 			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
@@ -122,7 +122,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "mkdir") {
 		if (params.size() == 4) {
-			if (fs.checkDirPermissions(whoami))
+			if (fs.checkDirPermissions(whoami, params[1]))
 				fs.createDir(params[1]);
 			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
@@ -131,7 +131,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "touch") {
 		if (params.size() == 4) {
-			if (fs.checkDirPermissions(whoami)) {
+			if (fs.checkDirPermissions(whoami, params[1])) {
 				int size = 0;
 				try { size = stoi(params[1]); }
 				catch (const exception& e) {};
@@ -144,7 +144,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "vi" or params[0] == "vim") {
 		if (params.size() == 4) {
-			if (fs.checkDirPermissions(whoami)) {
+			if (fs.checkDirPermissions(whoami, params[1])) {
 				int size = 1;
 				try { size = stoi(params[1]); }
 				catch (const exception& e) {};
@@ -157,7 +157,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "stat") {
 		if (params.size() == 4) {
-			if (fs.checkDirPermissions(whoami)) {
+			if (fs.checkDirPermissions(whoami, params[1])) {
 				fs.showFileStatus(params[1]);
 			}
 			else cout << "sh: " + command + " :Permission denied." << endl;
@@ -187,7 +187,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "cat") {
 		if (params.size() == 4) {
-			if (fs.checkDirPermissions(whoami))
+			if (fs.checkDirPermissions(whoami, params[1]))
 				cout << fs.printFile(params[1]) << endl;
 			else cout << "sh: " + command + " :Permission denied." << endl;
 		}

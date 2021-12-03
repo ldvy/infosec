@@ -77,7 +77,7 @@ public:
 
 	void editFile(unsigned int blockAddress, string text = "");
 
-	bool checkDirPermissions(string username);
+	bool checkDirPermissions(string username, string wantedPath = "");
 
 	bool fileAction(string path, int action, string text = "");
 

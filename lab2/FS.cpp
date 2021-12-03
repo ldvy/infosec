@@ -491,7 +491,7 @@ bool Filesystem::moveFile(const string& sourceFilePath, string targetFilePath) {
 	return true;
 }
 
-bool Filesystem::checkDirPermissions(string username) {
+bool Filesystem::checkDirPermissions(string username, string wantedPath) {
 	int dirParameterPos;
 
 	if (username == "guest")
@@ -499,7 +499,8 @@ bool Filesystem::checkDirPermissions(string username) {
 	else
 		dirParameterPos = 2;
 
-	if (workingDir.find(getUserInfo(username)[dirParameterPos]) != std::string::npos)
+	wantedPath = fullPath(wantedPath);
+	if (wantedPath.find(getUserInfo(username)[dirParameterPos]) != std::string::npos)
 		return true;
 	else
 		return false;
