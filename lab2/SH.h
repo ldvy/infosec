@@ -94,7 +94,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "cp") {
 		if (params.size() == 5) {
-			if (fs.checkDirPermissions(whoami, params[1]))
+			if (fs.checkDirPermissions(whoami, params[1]) and fs.checkDirPermissions(whoami, params[2]))
 				fs.copyFile(params[1], params[2]);
 			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
@@ -103,7 +103,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 
 	else if (params[0] == "mv") {
 		if (params.size() == 5) {
-			if (fs.checkDirPermissions(whoami, params[1]))
+			if (fs.checkDirPermissions(whoami, params[1]) and fs.checkDirPermissions(whoami, params[2]))
 				fs.moveFile(params[1], params[2]);
 			else
 				cout << "sh: " + command + " :Permission denied." << endl;
