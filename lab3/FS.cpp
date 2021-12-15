@@ -53,6 +53,10 @@ bool Filesystem::load() {
 		createDir("/secrets");
 		createFile("/secrets/reg.jrn", 1024, false);
 		save();
+		createFile("/secrets/sec.jrn", 1024, false);
+		save();
+		fileAction("/secrets/sec.jrn", 2);  // action = 0 - clean
+		save();
 		createUser("root");
 		createUser("guest");
 	}
@@ -719,8 +723,8 @@ bool Filesystem::notifyRoot(string path) {
 	string events = printFile(path);
 
 	if (events != "") {
-		cout << "\nPlease review the below events that took place while you were away:\n" << events << "\n\n";
-		return fileAction("/secrets/reg.jrn", 2);  // action = 0 - clean
+		cout << events << "\n";
+		return fileAction(path, 2);  // action = 0 - clean
 	}
 	else
 		cout << "\nThere are no events in journal " + path << ".\n\n";

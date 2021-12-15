@@ -8,9 +8,6 @@
 #include <algorithm>
 #include <iterator>
 #include "FS.h"
-// LAB4
-#include <iomanip>
-#include <ctime>
 
 using namespace std;
 string whoami = "guest";
@@ -39,18 +36,6 @@ string prompt(const string& workingDir) {
 		return whoami + "@localhost" + ":" + workingDir + "# ";
 }
 
-// LAB 4
-string getTime() {
-	auto t = std::time(nullptr);
-	auto tm = *std::localtime(&t);
-
-	std::ostringstream oss;
-	oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
-	auto str = oss.str();
-
-	return str;
-}
-
 bool authUser(Filesystem& fs, string username, const string& pass = "") {
 	vector <string> tempVec = fs.getUserInfo(username);
 
@@ -63,14 +48,7 @@ bool authUser(Filesystem& fs, string username, const string& pass = "") {
 
 	if (username == "root") {
 		if (pass == tempVec[1]) {
-			cout << "\nPlease review the below events that took place while you were away." << endl;
-
-			cout << "Registration Journal:" << endl;
 			fs.notifyRoot("/secrets/reg.jrn");
-
-			cout << "\nSecurity Journal:" << endl;
-			fs.notifyRoot("/secrets/sec.jrn");
-
 			whoami = username;
 			fs.changeWorkingDir(tempVec[2]);
 			tempVec.clear();
@@ -79,8 +57,8 @@ bool authUser(Filesystem& fs, string username, const string& pass = "") {
 		else {
 			cout << "Incorrect password for user " + username + "." << endl;
 			tempVec.clear();
-			fs.fileAction("/secrets/sec.jrn", 0, "Failed log in attempt for ROOT at " + getTime() + "!.\n");  // action = 0 - append
-			fs.save();
+			//fs.fileAction("/secrets/reg.jrn", 0, "Failed log in attempt for user " + username + ".\n");  // action = 0 - append
+			//fs.save();
 			return false;
 		}
 	}
@@ -96,8 +74,8 @@ bool authUser(Filesystem& fs, string username, const string& pass = "") {
 			else {
 				cout << "Incorrect password for user " + username + " or user doesn't exist." << endl;
 				tempVec.clear();
-				fs.fileAction("/secrets/sec.jrn", 0, "Failed log in attempt for user " + username + " at " + getTime() + ".\n");  // action = 0 - append
-				fs.save();
+				//fs.fileAction("/secrets/reg.jrn", 0, "Failed log in attempt for user " + username + ".\n");  // action = 0 - append
+				//fs.save();
 				return false;
 			}
 		}
@@ -118,10 +96,6 @@ bool kickBan(Filesystem& fs) {  // true for kick/ban needed, false for no kick/b
 		if (stoi(tempVec[4]) == 0) {
 			if (stoi(tempVec[6]) == 0) {
 				cout << "User " + whoami + " got banned. Please contact administrator." << endl;
-
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " got banned at " + getTime() + "!\n");  // action = 0 - append
-				fs.save();
-
 				fs.userOperations(whoami, 0);
 				authUser(fs, "guest");
 				return true;
@@ -171,11 +145,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 		if (params.size() == 5) {
 			if (fs.checkDirPermissions(whoami, params[1]) and fs.checkDirPermissions(whoami, params[2]))
 				fs.copyFile(params[1], params[2]);
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -184,11 +154,8 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 		if (params.size() == 5) {
 			if (fs.checkDirPermissions(whoami, params[1]) and fs.checkDirPermissions(whoami, params[2]))
 				fs.moveFile(params[1], params[2]);
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
+			else
 				cout << "sh: " + command + " :Permission denied." << endl;
-			}
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -197,11 +164,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 		if (params.size() == 4) {
 			if (fs.checkDirPermissions(whoami, params[1]))
 				fs.deleteFile(params[1]);
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -210,11 +173,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 		if (params.size() == 4) {
 			if (fs.checkDirPermissions(whoami, params[1]))
 				fs.createDir(params[1]);
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -227,11 +186,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 				catch (const exception& e) {};
 				fs.createFile(params[1], size * 1024);
 			}
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -244,11 +199,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 				catch (const exception& e) {};
 				fs.createFile(params[1], size * 1024, true);
 			}
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -258,11 +209,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 			if (fs.checkDirPermissions(whoami, params[1])) {
 				fs.showFileStatus(params[1]);
 			}
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -272,11 +219,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 			if (whoami == "root") {
 				fs.createUser(params[1]);
 			}
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -286,11 +229,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 			if (whoami == "root") {
 				fs.notifyRoot("/secrets/" + params[1]);
 			}
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -299,11 +238,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 		if (params.size() == 4) {
 			if (fs.checkDirPermissions(whoami, params[1]))
 				cout << fs.printFile(params[1]) << endl;
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
@@ -343,11 +278,7 @@ bool execute(Filesystem& fs, const string& command, string workingDir) {
 				}
 				else cout << "Unable to perform operation " + params[2] + " on user " + params[1] + "." << endl;
 			}
-			else {
-				fs.fileAction("/secrets/sec.jrn", 0, "User " + whoami + " tried to perform an unauthorized command at " + getTime() + "\n" + command + "\n");  // action = 0 - append
-				fs.save();
-				cout << "sh: " + command + " :Permission denied." << endl;
-			}
+			else cout << "sh: " + command + " :Permission denied." << endl;
 		}
 		else cout << "Excessive or insufficient operands." << endl;
 	}
